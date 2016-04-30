@@ -54,10 +54,11 @@ public abstract class Stub
         throws UnknownHostException
     {
         ClassCheck(c);
-        SkeletonCheck(skeleton, "");
-        
+        //SkeletonCheck(skeleton, "");
+        if (skeleton.getHostname() == null) throw new IllegalStateException();
+
         if(skeleton.getHostname().equals("0.0.0.0")) {
-          InetAddress localhost = InetAddress.getLocalHost(); 
+          InetAddress localhost = InetAddress.getLocalHost();
         }
 
         InetSocketAddress address = new InetSocketAddress(skeleton.getHostname(), skeleton.getPort());
@@ -102,10 +103,10 @@ public abstract class Stub
     {
         ClassCheck(c);
         SkeletonCheck(skeleton, hostname);
-        
+
         InetSocketAddress address = new InetSocketAddress(hostname, skeleton.getPort());
         InvocationHandler handler = new RMIInvocationHandler(address, c);
-        
+
         Object p = (T) Proxy.newProxyInstance(c.getClassLoader(), new Class[] { c }, handler);
         return (T) p;
     }

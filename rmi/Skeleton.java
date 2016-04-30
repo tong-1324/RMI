@@ -34,14 +34,14 @@ public class Skeleton<T>
 {
 
     private int port = 0;
-    private String hostname = null; 
+    private String hostname = null;
     private Class intface = null;
 
-    private Object server = null;    
+    private Object server = null;
     private volatile boolean isRunning = false;
     private ServerThread sthread = null;
     private ServerSocket ssocket;
-    
+
 
     /** Creates a <code>Skeleton</code> with no initial server address. The
         address will be determined by the system when <code>start</code> is
@@ -98,8 +98,10 @@ public class Skeleton<T>
 
         this.intface = c;
         this.server = server;
-        this.port = address.getPort();
-        this.hostname = address.getHostName();
+        if (address != null){
+          this.port = address.getPort();
+          this.hostname = address.getHostName();
+        }
     }
 
     /** Called when the listening thread exits.
@@ -171,13 +173,13 @@ public class Skeleton<T>
     public synchronized void start() throws RMIException
     {
         if(isRunning() == false) {
-            setisRunning(true);            
+            setisRunning(true);
             try {
-                ssocket = new ServerSocket(this.port);    
-                this.port = ssocket.getLocalPort();                   
-                if(this.hostname == null) {        
+                ssocket = new ServerSocket(this.port);
+                this.port = ssocket.getLocalPort();
+                if(this.hostname == null) {
                     this.hostname = ssocket.getInetAddress().getHostName();
-                }                                
+                }
                 sthread = new ServerThread(this, ssocket);
                 sthread.start();
             } catch (Exception e) {
@@ -203,7 +205,7 @@ public class Skeleton<T>
     {
         try {
             setisRunning(false);
-            ssocket.close();    
+            ssocket.close();
             stopped(new Throwable("Normally stopped."));
         } catch (Exception e) {
             stopped(new Throwable(e.getCause()));
