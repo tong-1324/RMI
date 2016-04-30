@@ -203,8 +203,10 @@ public class Skeleton<T>
     {
         try {
             setisRunning(false);
-            ssocket.close();      
-        } catch (Exception e) {           
+            ssocket.close();    
+            stopped(new Throwable("Normally stopped."));
+        } catch (Exception e) {
+            stopped(new Throwable(e.getCause()));
             System.err.println(e.getCause());
         }
 
