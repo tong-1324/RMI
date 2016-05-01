@@ -65,8 +65,14 @@ public class RMIInvocationHandler implements InvocationHandler, Serializable {
 			message = (Object) in.readObject();
 			connection.close();
 		} catch (Exception e) {
+			if(method.getName().equals("equals") &&
+					method.getReturnType().getName().equals("boolean") &&
+					method.getParameterTypes().length == 1) {
+						 return false;
+					}
 			throw new RMIException(e);
 		}
+
 		if(error == 1)
 			throw (Exception) message;
 		else if (error == 2)
