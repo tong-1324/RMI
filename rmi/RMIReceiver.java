@@ -27,14 +27,20 @@ public class RMIReceiver extends Thread {
 				Object returnType = in.readObject();
 				Object args = in.readObject();
 
-				Method serverMethod = skeleton.getIntface().getMethod((String)methodName,(Class[])parameterTypes);
+				try{
+					Method serverMethod = skeleton.getIntface().getMethod((String)methodName,(Class[])parameterTypes);
+				} catch (Exception e){
+					out.writeObject(2);
+					out.writeObject(e);
+				}
 
 				try {
+					Method serverMethod = skeleton.getIntface().getMethod((String)methodName,(Class[])parameterTypes);
 					Object serverReturn = serverMethod.invoke(skeleton.getServer(), (Object [])args);
-					out.writeObject(false);
+					out.writeObject(0);
 					out.writeObject(serverReturn);
 				} catch(Exception e){
-					out.writeObject(true);
+					out.writeObject(1);
 					out.writeObject(e.getCause());
 				}
 				connection.close();

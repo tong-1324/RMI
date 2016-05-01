@@ -42,14 +42,14 @@ public class RMIInvocationHandler implements InvocationHandler, Serializable {
 					RMIInvocationHandler p = (RMIInvocationHandler) java.lang.reflect.Proxy.getInvocationHandler(args[0]);
 					return p.compare(this.intface, this.address);
 				} catch (Exception e){
-					return false;
+					//return false;
 				}
 			} else
 				return false;
 		}
 
 		Socket connection;
-		boolean error;
+		int error;
 		Object message;
 
 		try {
@@ -61,16 +61,18 @@ public class RMIInvocationHandler implements InvocationHandler, Serializable {
 			out.writeObject(method.getParameterTypes());
 			out.writeObject(method.getReturnType().getName());
 			out.writeObject(args);
-			error = (boolean) in.readObject();
+			error = (int) in.readObject();
 			message = (Object) in.readObject();
 			connection.close();
 		} catch (Exception e) {
 			throw new RMIException(e);
 		}
-		if(error)
+		if(error == 1)
 			throw (Exception) message;
-		else
-			return message;
+		else if (error == 2)
+			throw new RMIException((Exception) message);
+
+		return message;
 	}
 
 	public boolean compare(Class i, InetSocketAddress ad){
