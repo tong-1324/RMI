@@ -24,7 +24,6 @@ public class RMIReceiver extends Thread {
 
 				Object methodName = in.readObject();
 				Object parameterTypes = in.readObject();
-				Object returnType = in.readObject();
 				Object args = in.readObject();
 
 				try{

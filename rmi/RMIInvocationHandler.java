@@ -5,7 +5,8 @@ import java.net.*;
 import java.lang.reflect.*;
 import java.lang.reflect.Proxy;
 import java.io.Serializable;
-
+import java.beans.PropertyEditor;
+import java.beans.PropertyEditorManager;
 
 public class RMIInvocationHandler implements InvocationHandler, Serializable {
 
@@ -36,13 +37,14 @@ public class RMIInvocationHandler implements InvocationHandler, Serializable {
 
 		if(method.getName().equals("equals") &&
 				method.getReturnType().getName().equals("boolean") &&
-				method.getParameterTypes().length == 1) {
+				method.getParameterTypes().length == 1 &&
+				method.getParameterTypes()[0].toString().contains("Object")) {
 			if(args[0] != null){
 				try{
 					RMIInvocationHandler p = (RMIInvocationHandler) java.lang.reflect.Proxy.getInvocationHandler(args[0]);
 					return p.compare(this.intface, this.address);
 				} catch (Exception e){
-					//return false;
+					return false;
 				}
 			} else
 				return false;
@@ -59,26 +61,27 @@ public class RMIInvocationHandler implements InvocationHandler, Serializable {
 
 			out.writeObject(method.getName());
 			out.writeObject(method.getParameterTypes());
-			out.writeObject(method.getReturnType().getName());
 			out.writeObject(args);
 			error = (int) in.readObject();
 			message = (Object) in.readObject();
 			connection.close();
 		} catch (Exception e) {
-			if(method.getName().equals("equals") &&
-					method.getReturnType().getName().equals("boolean") &&
-					method.getParameterTypes().length == 1) {
-						 return false;
-					}
 			throw new RMIException(e);
 		}
 
 		if(error == 1)
 			throw (Exception) message;
-		else if (error == 2)
+		else if (error == 2){
 			throw new RMIException((Exception) message);
+		}
 
 		return message;
+	}
+
+	private Object convert(Class<?> targetType, String text) {
+    	PropertyEditor editor = PropertyEditorManager.findEditor(targetType);
+    	editor.setAsText(text);
+    	return editor.getValue();
 	}
 
 	public boolean compare(Class i, InetSocketAddress ad){

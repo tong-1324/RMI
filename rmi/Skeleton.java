@@ -238,6 +238,11 @@ public class Skeleton<T>
         return this.intface;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        return false;
+    }
+
     private static void ClassCheck(Class c) {
       if (c == null) throw new NullPointerException();
       if (!c.isInterface()) throw new Error("Error: Class error");
